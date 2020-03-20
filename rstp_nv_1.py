@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
-from PyQt5.QtWidgets import QMessageBox, QRadioButton, QMainWindow, QApplication, QPushButton, QWidget, QTabWidget, \
-    QDesktopWidget, QListWidget, QFileDialog
+from PyQt5.QtWidgets import QMessageBox, QRadioButton, QMainWindow, QApplication, QPushButton, QWidget, QTabWidget, QDesktopWidget, QListWidget, QFileDialog
 from PyQt5.QtGui import QIcon, QPixmap, QImage
 from PyQt5.QtCore import pyqtSlot
 from PyQt5 import QtCore
