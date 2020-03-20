@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""
-Редактор Spyder
 
-Это временный скриптовый файл.
-"""
+# Редактор Spyder
+
+# Это временный скриптовый файл.
+
 
 
 from pyhdf.SD import SD, SDC
@@ -61,18 +61,18 @@ print(ch31_data.dtype)
 
 
 fig,ax = plt.subplots(1,1,figsize = (10,14))
-'''
-CS=ax.imshow(ch31_data)
-cax=fig.colorbar(CS)
-ax.set_title('uncalibrated counts')
 
+# CS=ax.imshow(ch31_data)
+# cax=fig.colorbar(CS)
+# ax.set_title('uncalibrated counts')
+#
 # add a label to the colorbar and flip it around 270 degrees
 #
-out=cax.ax.set_ylabel('Chan 31 raw counts')
-out.set_verticalalignment('bottom')
-out.set_rotation(270)
-print(ch31_data.shape)
-'''
+# out=cax.ax.set_ylabel('Chan 31 raw counts')
+# out.set_verticalalignment('bottom')
+# out.set_rotation(270)
+# print(ch31_data.shape)
+
 
 scales=longwave_data.attributes()['radiance_scales']
 offsets=longwave_data.attributes()['radiance_offsets']
@@ -84,19 +84,19 @@ ch31_calibrated =(ch31_data - ch31_offset)*ch31_scale
 
 
 
-'''
-CS=ax.imshow(ch31_calibrated)
-cax=fig.colorbar(CS)
-ax.set_title('Channel 31 radiance')
-'''
+
+# CS=ax.imshow(ch31_calibrated)
+# cax=fig.colorbar(CS)
+# ax.set_title('Channel 31 radiance')
+
 #
 # add a label to the colorbar and flip it around 270 degrees
-'''
-out=cax.ax.set_ylabel('Chan radiance $(W\,m^{-2}\,\mu m^{-1}\,sr^{-1})$')
-out.set_verticalalignment('bottom')
-out.set_rotation(270)
-ch31_calibrated.shape
-'''
+
+# out=cax.ax.set_ylabel('Chan radiance $(W\,m^{-2}\,\mu m^{-1}\,sr^{-1})$')
+# out.set_verticalalignment('bottom')
+# out.set_rotation(270)
+# ch31_calibrated.shape
+
 chisl=(1.4387752*(10**4))/11.030
 chisl1=(1.19104282*(10**8)) * (11.030**(-5))
 rez=np.divide(chisl1, ch31_calibrated)
