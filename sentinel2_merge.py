@@ -1,5 +1,5 @@
-from osgeo import gdal, gdal_array
-import numpy as np
+from osgeo import gdal
+
 format = 'GTiff'
 driver = gdal.GetDriverByName(format)
 metadata = driver.GetMetadata()
@@ -24,7 +24,7 @@ x = rasterinfo.RasterXSize
 y = rasterinfo.RasterYSize
 proj = rasterinfo.GetProjection()
 transform = rasterinfo.GetGeoTransform()
-rasterinfo = None
+
 output=driver.Create('C:/KRASNOYARSK/sentinel2.tif', x, y, len(files), gdal.GDT_UInt16)
 output.SetProjection(proj)
 output.SetGeoTransform(transform)
@@ -38,5 +38,3 @@ for i in range (len(files)):
     bandarr[bandarr == 0] = np.nan
     output.GetRasterBand(i+1).WriteArray(bandarr)
     '''
-
-output = None

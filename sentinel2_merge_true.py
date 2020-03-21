@@ -1,7 +1,6 @@
-from osgeo import gdal, gdal_array
-import numpy as np
-import scipy
-from scipy import ndimage, misc
+from osgeo import gdal
+from scipy import ndimage
+
 format = 'GTiff'
 driver = gdal.GetDriverByName(format)
 metadata = driver.GetMetadata()

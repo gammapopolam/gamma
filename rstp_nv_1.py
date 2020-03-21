@@ -1,36 +1,24 @@
 # -*- coding: utf-8 -*-
 import sys
-from PyQt5.QtWidgets import QMessageBox, QRadioButton, QMainWindow, QApplication, QPushButton, QWidget, QTabWidget, QDesktopWidget, QListWidget, QFileDialog
-from PyQt5.QtGui import QIcon, QPixmap, QImage
-from PyQt5.QtCore import pyqtSlot
-from PyQt5 import QtCore
-import gdal
-import numpy
-import numpy.ma as ma
-import matplotlib.pyplot as plt
 
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
-from matplotlib.figure import Figure
+import gdal
+import matplotlib.pyplot as plt
+import numpy
+from PyQt5.QtWidgets import QMessageBox, QRadioButton, QMainWindow, QApplication, QPushButton, QWidget, QTabWidget, \
+    QDesktopWidget, QListWidget, QFileDialog
 
 
 class RSTP(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.title = 'RSTP'
-        self.left = 0
-        self.top = 0
-        self.width = 480
-        self.height = 720
-        self.setWindowTitle(self.title)
-        self.setGeometry(self.left, self.top, self.width, self.height)
+        self.setWindowTitle('RSTP')
+        self.setGeometry(0, 0, 480, 720)
         # Initialize tab screen
         self.tabwidget = QTabWidget(self)
         self.tabwidget.setGeometry(0, 0, 1280, 720)
         self.tab1()
         self.tab2()
-        # self.tab3() #inactive
         self.tab4()
         self.show()
 
@@ -307,6 +295,7 @@ class RSTP(QMainWindow):
 
         QMessageBox.question(self, 'Сохранение завершено', 'Теперь вы можете открыть сохраненный файл в QGIS/ArcGIS',
                              QMessageBox.Ok, QMessageBox.Ok)
+
     def rgb_show(self):  # натуральные цвета
         if self.landsat8.isChecked():
             rgb = numpy.dstack((self.red, self.green, self.blue))
@@ -330,6 +319,7 @@ class RSTP(QMainWindow):
             plt.xlabel('Сочетание красного, зелёного и синего каналов')
             plt.show()
             '''
+
     def false1_show(self):  # инфракрасный, ближний ИК + красный + зеленый
         if self.landsat8.isChecked():
             nrg = numpy.dstack((self.NIR, self.red, self.green))
@@ -345,6 +335,7 @@ class RSTP(QMainWindow):
             plt.show()
         if self.sentinel2.isChecked():
             QMessageBox.question(self, 'Недоступно', "К сожалению, показ недоступен для Sentinel 2", QMessageBox.Ok, QMessageBox.Ok)
+
     def water_surface_show(self):  # проникает через дым, SWIR2+SWIR1+NIR
         if self.landsat8.isChecked():
             water_surface = numpy.dstack((self.SWIR2, self.SWIR1, self.NIR))
@@ -352,7 +343,7 @@ class RSTP(QMainWindow):
             plotted = plt.imshow(scaled_water_surface)
             plt.xlabel('Сочетание ИК каналов')
             plt.show()
-        if self.landsat7.isChecked() or landsat5.isChecked():
+        if self.landsat7.isChecked() or self.landsat5.isChecked():
             water_surface = numpy.dstack((self.SWIR2, self.SWIR1, self.NIR))
             plotted = plt.imshow(water_surface)
             plt.xlabel('Сочетание ИК каналов')
@@ -367,7 +358,6 @@ class RSTP(QMainWindow):
         self.bands=0
         self.fname = []
         QMessageBox.question(self, '[ДАННЫЕ УДАЛЕНЫ]', 'Данные удалены из памяти', QMessageBox.Ok, QMessageBox.Ok)
-
 
     def bt_select(self):
         # считывание метадаты
