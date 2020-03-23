@@ -68,6 +68,7 @@ bandarr5 = band5.GetRasterBand(1).ReadAsArray()
 VRE2 = output.GetRasterBand(5)
 VRE2.SetDescription('VRE2 band (6) Res 20m Wave 733-748')
 bandarr5_scaled= ndimage.zoom(bandarr5, 2, order=1)
+VRE2.WriteArray(bandarr5_scaled)
 bandarr5 = None
 bandarr5_scaled = None
 
@@ -110,30 +111,3 @@ bandarr9_scaled = None
 
 output = None
 print('end')
-
-'''
-
-
-
-for i in range (len(files)):
-    print(i)
-    band = gdal.Open(files[i])
-    print(band.RasterXSize, band.RasterYSize)
-    if band.RasterXSize < x and band.RasterYSize < y:
-        print('решейпим')
-
-        bandarr = band.GetRasterBand(1).ReadAsArray().astype(np.float32)
-        print(bandarr.shape)
-        bandarr1= np.resize(bandarr, (x, y))
-        output.GetRasterBand(i + 1).WriteArray(bandarr1)
-    else:
-        output.GetRasterBand(i + 1).WriteArray(bandarr)
-
-
-
-
-
-#bandarr[bandarr == 0.0] = np.nan
-
-output = None
-'''

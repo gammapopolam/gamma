@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
-
+from scipy import ndimage
 import gdal
 import matplotlib.pyplot as plt
 import numpy
@@ -9,7 +9,6 @@ from PyQt5.QtWidgets import QMessageBox, QRadioButton, QMainWindow, QApplication
 
 
 class RSTP(QMainWindow):
-
     def __init__(self):
         super().__init__()
         self.setWindowTitle('RSTP')
@@ -21,7 +20,6 @@ class RSTP(QMainWindow):
         self.tab2()
         self.tab4()
         self.show()
-
     def tab1(self):  # объединение
         # Add tab
         self.tab1 = QWidget(self)
@@ -153,12 +151,12 @@ class RSTP(QMainWindow):
             print('условие пройдено')
             print(self.x, self.y)
         print('пробегаемся по каналам')
-        for i in range(len(self.fname)):
-            self.bands = self.bands + 1
+        if self.landsat8.isChecked():
             print(self.bands)
             band = gdal.Open(str(self.fname[i]))
             print('большое условие')
-            if self.landsat8.isChecked():  # ландсат 8
+            for i in range(len(self.fname)):
+                self.bands = self.bands + 1
                 # к нормализованным добавить множитель uint16bit, выводить через matplotlib нормализованные, а в файл добавлять ненормализованные
                 if 'B1' in self.fname[i]:
                     self.coastal_aerosol = band.GetRasterBand(1).ReadAsArray()
@@ -181,7 +179,9 @@ class RSTP(QMainWindow):
                 elif 'B7' in self.fname[i]:
                     self.SWIR2 = band.GetRasterBand(1).ReadAsArray()
                     self.SWIR2[self.SWIR2 == 0] = numpy.nan
-            elif self.landsat7.isChecked() or self.landsat5.isChecked():  # ландсат 7, 5
+        elif self.landsat7.isChecked() or self.landsat5.isChecked():  # ландсат 7, 5
+            for i in range(len(self.fname)):
+                self.bands = self.bands + 1
                 if 'B1' in self.fname[i]:
                     self.blue = band.GetRasterBand(1).ReadAsArray()
                     self.blue[self.blue == 0] = numpy.nan
@@ -203,42 +203,26 @@ class RSTP(QMainWindow):
                 elif 'B7' in self.fname[i]:
                     self.SWIR2 = band.GetRasterBand(1).ReadAsArray()
                     self.SWIR2[self.SWIR2 == 0] = numpy.nan
-            elif self.sentinel2.isChecked():  # сентинель 2
-                if 'B01' in self.fname[i]:
-                    self.coastal_aerosol = band.GetRasterBand(1).ReadAsArray()
-                elif 'B02' in self.fname[i]:
-                    self.blue = band.GetRasterBand(1).ReadAsArray()
-                    #self.blue[self.blue == 0] = numpy.nan
-                elif 'B03' in self.fname[i]:
-                    self.green = band.GetRasterBand(1).ReadAsArray()
-                    #self.green[self.green == 0] = numpy.nan
-                elif 'B04' in self.fname[i]:
-                    self.red = band.GetRasterBand(1).ReadAsArray()
-                    #self.red[self.red == 0] = numpy.nan
-                elif 'B05' in self.fname[i]:
-                    self.VRE1 = band.GetRasterBand(1).ReadAsArray()
-                    #self.VRE1[self.VRE1 == 0] = numpy.nan
-                elif 'B06' in self.fname[i]:
-                    self.VRE2 = band.GetRasterBand(1).ReadAsArray()
-                    #self.VRE2[self.green == 0] = numpy.nan
-                elif 'B07' in self.fname[i]:
-                    self.VRE3 = band.GetRasterBand(1).ReadAsArray()
-                    #self.VRE3[self.VRE3 == 0] = numpy.nan
-                elif 'B08' in self.fname[i]:
-                    self.NIR = band.GetRasterBand(1).ReadAsArray()
-                    #self.NIR[self.NIR == 0] = numpy.nan
-                elif 'B09' in self.fname[i]:
-                    self.water_vapour = band.GetRasterBand(1).ReadAsArray()
-                    #self.water_vapour[self.water_vapour == 0] = numpy.nan
-                elif 'B10' in self.fname[i]:
-                    self.SWIR1 = band.GetRasterBand(1).ReadAsArray()
-                    #self.SWIR1[self.SWIR1 == 0] = numpy.nan
-                elif 'B11' in self.fname[i]:
-                    self.SWIR2 = band.GetRasterBand(1).ReadAsArray()
-                    #self.SWIR2[self.SWIR2 == 0] = numpy.nan
-                elif 'B12' in self.fname[i]:
-                    self.SWIR3 = band.GetRasterBand(1).ReadAsArray()
-                    #self.SWIR3[self.SWIR3 == 0] = numpy.nan
+        elif self.sentinel2.isChecked():  # сентинель 2
+            self.bands = 9
+            band1 = gdal.Open(self.fname[1])
+            self.blue = band1.GetRasterBand(1).ReadAsArray()
+            band2 = gdal.Open(self.fname[2])
+            self.green = band2.GetRasterBand(1).ReadAsArray()
+            band3 = gdal.Open(self.fname[3])
+            self.red = band3.GetRasterBand(1).ReadAsArray()
+            band4 = gdal.Open(self.fname[4])
+            self.VRE1 = band4.GetRasterBand(1).ReadAsArray()
+            band5 = gdal.Open(self.fname[5])
+            self.VRE2 = band5.GetRasterBand(1).ReadAsArray()
+            band6 = gdal.Open(self.fname[6])
+            self.VRE3 = band6.GetRasterBand(1).ReadAsArray()
+            band7 = gdal.Open(self.fname[7])
+            self.NIR = band7.GetRasterBand(1).ReadAsArray()
+            band8 = gdal.Open(self.fname[8])
+            self.SWIR1 = band8.GetRasterBand(1).ReadAsArray()
+            band9 = gdal.Open(self.fname[9])
+            self.SWIR2 = band9.GetRasterBand(1).ReadAsArray()
 
         QMessageBox.question(self, 'Предпроцесс завершён', 'Начните сохранение обработанных данных или их показ',
                              QMessageBox.Ok, QMessageBox.Ok)
@@ -262,35 +246,40 @@ class RSTP(QMainWindow):
             for i in range(self.bands):
                 output.GetRasterBand(i + 1).WriteArray(allbands[i])
         elif self.sentinel2.isChecked():
-            for i in range(self.bands):
-                print('большое сохранение')
-                if i + 1 == 1:
-                    output.GetRasterBand(i + 1).WriteArray(self.coastal_aerosol)
-                elif i + 1 == 2:
-                    output.GetRasterBand(i + 1).WriteArray(self.blue)
-                elif i + 1 == 3:
-                    output.GetRasterBand(i + 1).WriteArray(self.green)
-                elif i + 1 == 4:
-                    output.GetRasterBand(i + 1).WriteArray(self.red)
-                elif i + 1 == 5:
-                    output.GetRasterBand(i + 1).WriteArray(self.VRE1)
-                elif i + 1 == 6:
-                    output.GetRasterBand(i + 1).WriteArray(self.VRE2)
-                elif i + 1 == 7:
-                    output.GetRasterBand(i + 1).WriteArray(self.VRE3)
-                elif i + 1 == 8:
-                    output.GetRasterBand(i + 1).WriteArray(self.NIR)
-                elif i + 1 == 9:
-                    output.GetRasterBand(i + 1).WriteArray(self.water_vapour)
-                elif i + 1 == 10:
-                    output.GetRasterBand(i + 1).WriteArray(self.SWIR1)
-                elif i + 1 == 11:
-                    output.GetRasterBand(i + 1).WriteArray(self.SWIR2)
-                elif i + 1 == 12:
-                    output.GetRasterBand(i + 1).WriteArray(self.SWIR3)
+            blue = output.GetRasterBand(1)
+            blue.SetDescription('Blue band (2) Res 10m Wave 458-523')
+            blue.WriteArray(self.blue)
+            green = output.GetRasterBand(2)
+            green.SetDescription('Green band (3) Res 10m Wave 543-578')
+            green.WriteArray(self.green)
+            red = output.GetRasterBand(3)
+            red.SetDescription('Red band (4) Res 10m Wave 650-680')
+            red.WriteArray(self.red)
+            VRE1 = output.GetRasterBand(4)
+            VRE1.SetDescription('VRE1 band (5) Res 20m Wave 698-713')
+            VRE1_scaled = ndimage.zoom(self.VRE1, 2, order=1)
+            VRE1.WriteArray(VRE1_scaled)
+            VRE2 = output.GetRasterBand(4)
+            VRE2.SetDescription('VRE2 band (6) Res 20m Wave 733-748')
+            VRE2_scaled = ndimage.zoom(self.VRE2, 2, order=1)
+            VRE2.WriteArray(VRE2_scaled)
+            VRE3 = output.GetRasterBand(6)
+            VRE3.SetDescription('VRE3 band (7) Res 20m Wave 773-793')
+            VRE3_scaled = ndimage.zoom(self.VRE3, 2, order=1)
+            VRE3.WriteArray(VRE3_scaled)
+            NIR = output.GetRasterBand(7)
+            NIR.SetDescription('NIR band (8) Res 10m Wave 785-899')
+            NIR.WriteArray(self.NIR)
+            SWIR1 = output.GetRasterBand(8)
+            SWIR1.SetDescription('SWIR1 band (11) Res 20m Wave 1565-1655')
+            SWIR1_scaled = ndimage.zoom(self.SWIR1, 2, order=1)
+            SWIR1.WriteArray(SWIR1_scaled)
+            SWIR2 = output.GetRasterBand(9)
+            SWIR2.SetDescription('SWIR2 band (12) Res 20m Wave 2100-2280')
+            SWIR2_scaled = ndimage.zoom(SWIR2, 2, order=1)
+            SWIR2.WriteArray(SWIR2_scaled)
         output.SetProjection(self.proj)
         output.SetGeoTransform(self.transform)
-        allbands = None
         output = None
 
         QMessageBox.question(self, 'Сохранение завершено', 'Теперь вы можете открыть сохраненный файл в QGIS/ArcGIS',
