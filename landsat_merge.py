@@ -8,10 +8,10 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QFileDialog, QMessageBox
 import gdal
-from scipy import ndimage, misc
+from scipy import ndimage
 
 app = QApplication([])
-QMessageBox.question(None, 'Начало работы', 'Эта программа создана для объединения каналов снимков КА Landsat TM/ETM+/OLI/TIRS. Выбирайте каналы по порядку с 1 по 7, не включая панхроматический')
+QMessageBox.question(None, 'Начало работы', 'Эта программа создана для объединения каналов снимков КА Landsat TM/ETM+/OLI. Выбирайте каналы по порядку с 1 по 7, не включая панхроматический')
 inputs, _ = QFileDialog.getOpenFileNames(None, 'Выберите файлы', 'C:/')
 print(inputs[1])
 
@@ -30,7 +30,7 @@ elif '.jp2' in inputs[0]:
     QMessageBox.question(None, 'Экая неудача.', "Похоже, что вы выбрали снимки Sentinel-2 MSI. Перезапустите приложение.", QMessageBox.Ok,
                          QMessageBox.Ok)
 
-band = gdal.Open(inputs[0])
+band = gdal.Open(inputs[0]) #инфоканал
 proj = band.GetProjection()
 transform = band.GetGeoTransform()
 xsize = band.RasterXSize
@@ -51,6 +51,7 @@ if type_sat == 'OLI':
         arr = band.GetRasterBand(1).ReadAsArray()
         output.GetRasterBand(i+1).WriteArray(arr)
         band = None
+    #инфо для каналов
     output.GetRasterBand(1).SetDescription('B1 - coastal aerosol 30m/pix')
     output.GetRasterBand(2).SetDescription('B2 - blue 30m/pix')
     output.GetRasterBand(3).SetDescription('B3 - green 30m/pix')
@@ -66,6 +67,7 @@ elif type_sat == 'ETM+' or type_sat == 'TM':
         if 'B6' in inputs[i]:
             band = gdal.Open(str(inputs[i]))
             arr = band.GetRasterBand(1).ReadAsArray()
+            #bilinear interpolation
             arr1 = ndimage.zoom(arr, 2, order=1)
             output.GetRasterBand(i+1).WriteArray(arr1)
             band = None
@@ -77,14 +79,17 @@ elif type_sat == 'ETM+' or type_sat == 'TM':
             output.GetRasterBand(i + 1).WriteArray(arr)
             band = None
             arr = None
+    #инфо для каналов
     output.GetRasterBand(1).SetDescription('B1 - blue 30m/pix')
     output.GetRasterBand(2).SetDescription('B2 - green 30m/pix')
     output.GetRasterBand(3).SetDescription('B3 - red 30m/pix')
     output.GetRasterBand(4).SetDescription('B4 - NIR 30m/pix')
     output.GetRasterBand(5).SetDescription('B5 - SWIR1 30m/pix')
-    output.GetRasterBand(6).SetDescription('B6 - TIR 30m/pix')
+    output.GetRasterBand(6).SetDescription('B6 - TIR 60m/pix')
     #  bilinear interpolation for band6
     output.GetRasterBand(7).SetDescription('B7 - SWIR2 30m/pix')
     output.SetProjection(proj)
     output.SetGeoTransform(transform)
 output = None
+QMessageBox.question(None, 'Сохранено', "Объединение завершено. Вы можете открыть файл в QGIS/ArcGIS", QMessageBox.Ok,
+                     QMessageBox.Ok)
