@@ -20,14 +20,14 @@ if not inputs:
                          QMessageBox.Ok)
 
 print(inputs[1])
-type_sat = 'MSI'  # sentinel 2
+type_sat = 'MSI'  # sentinel 2 - фича старой версии
 
 band = gdal.Open(inputs[0])
 proj = band.GetProjection()
 transform = band.GetGeoTransform()
-xsize = 10980
+xsize = 10980 #по умолчанию стоит разрешение 10980, это разрешение 10м/пикс, т.к. мы интерполируем к 10 метрам все 20-метровые и 60-метровые
 ysize = 10980
-band = None
+band = None #закрываем инфоканал
 
 format = 'GTiff'
 driver = gdal.GetDriverByName(format)
@@ -35,11 +35,11 @@ metadata = driver.GetMetadata()
 outputname, _ = QFileDialog.getSaveFileName(None, 'Save file')
 if outputname is None:
     QMessageBox.question(None, 'Экая неудача.', "Произошла ошибка. Выберите снова файл", QMessageBox.Ok, QMessageBox.Ok)
-output = driver.Create(str(outputname), xsize, ysize, len(inputs), gdal.GDT_UInt16)
+output = driver.Create(str(outputname), xsize, ysize, 13, gdal.GDT_UInt16)
 
 for i in range(len(inputs)):
     print('Processing ', i + 1, ' band')
-    if 'B05' in inputs[i] or 'B06' in inputs[i] or 'B07' in inputs[i] or 'B8A' in inputs[i] or 'B11' in inputs[i] or 'B12' in inputs[i]:
+    if 'B05' in inputs[i] or 'B06' in inputs[i] or 'B07' in inputs[i] or 'B8A' in inputs[i] or 'B11' in inputs[i] or 'B12' in inputs[i]: #все 20-метровые
         band = gdal.Open(str(inputs[i]))
         arr = band.GetRasterBand(1).ReadAsArray()
         arr1 = ndimage.zoom(arr, 2, order=1)
@@ -47,7 +47,7 @@ for i in range(len(inputs)):
         band = None
         arr = None
         arr1 = None
-    elif 'B09' in inputs[i] or 'B01' in inputs[i] or 'B10' in inputs[i]:
+    elif 'B09' in inputs[i] or 'B01' in inputs[i] or 'B10' in inputs[i]: #все 60-метровые
         band = gdal.Open(str(inputs[i]))
         arr = band.GetRasterBand(1).ReadAsArray()
         arr1 = ndimage.zoom(arr, 6, order=1)
