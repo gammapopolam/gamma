@@ -1,8 +1,7 @@
 import json
 from os import listdir
 from os.path import isfile, join
-
-# использовано из nktb40/mostransport_etl
+# тут бы нормально так засесть и прибраться...
 parced_list=[]
 def parcing(inputlist, mypath):
     print('processing: '+mypath)
