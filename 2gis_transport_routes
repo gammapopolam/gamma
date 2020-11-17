@@ -1,0 +1,40 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Nov  1 11:59:05 2020
+
+@author: gamma
+"""
+from geojson import LineString, Feature, FeatureCollection, dump
+import json
+from os import listdir
+from os.path import isfile, join
+
+def geom_parcing(inputlist, mypath, outputpath):
+    for file_name in inputlist:
+        features = []
+        lines=[]
+        file = json.load(open(mypath+'\\'+file_name, encoding='utf-8'))
+        item = file['result']['items'][0]
+        for d in item['directions']:
+            if d['type'] == 'loop':
+                d['type'] = 'circular'
+        item['directions'] = list(map(lambda x: x[1], list(filter(lambda x: x[1]['type'] != "additional" and not (x[1]['type'] == 'circular' and x[0] > 0), enumerate(item['directions'])))))
+        item['directions'].sort(key=lambda x: 0 if x['type'] == 'circular' else 1 if x['type'] == 'forward' else 2, reverse=False)
+        for i in range(len(item['directions'])):
+            line=item['directions'][i]['geometry']['selection'][11:-1].replace(',', ';').replace(' ', ',').split(';')
+            for cord in line:
+                lines.append((float(cord.split(',')[0]), float(cord.split(',')[1])))
+        lineg=LineString(lines)
+        features.append(Feature(geometry=lineg, properties={"name":file_name[:-5], "direction":i}))
+        feature_collection = FeatureCollection(features)
+        with open(outputpath+'\\'+file_name[:-5]+'_geom.geojson', 'w') as f:
+            dump(feature_collection, f)
+            print('success '+file_name)
+
+
+
+mypath=r'put/your/path'
+inputlist = [f for f in listdir(mypath) if isfile(join(mypath, f)) and '.json' in f]
+outputpath=r'put/your/outpath'
+result=geom_parcing(inputlist, mypath, outputpath)
+
