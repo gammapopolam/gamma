@@ -9,8 +9,11 @@ import pandas as pd
 from os.path import isfile, join
 import json
 import csv
-
-def csv_proc(mypath): #processing csv
+'''
+Скрипт берет JSON из 2gis, вытаскивает из них геометрию в прямом и обратном
+направлении, добавляет в Dataframe и потом фильтрует координаты и маршруты, проходящие через координаты.
+'''
+def csv_proc(mypath): #берет созданный groupby и убирает некоторые баги
     file=mypath+r'\\density_groupby.csv'
     outputfile=mypath+r'\\density_out.csv'
     reader = csv.reader(open(file, newline='', encoding='utf-8'), delimiter=';')
@@ -23,7 +26,7 @@ def csv_proc(mypath): #processing csv
             row.insert(1, count)
             writer.writerow(row)
     
-def process_2g(inputlist, ctr, ctr1, df): #regions
+def process_2g(inputlist, ctr, ctr1, df): #для данных из 2гис - корды и маршруты, повторяются. возвращает DataFrame
     for filename in inputlist:
         print(ctr1, filename)
         file = json.load(open(mypath+'\\'+filename, encoding='utf-8'))
@@ -57,14 +60,16 @@ def process(inputlist, ctr, ctr1, df): #moscow
     return df
 
 
-mypath=r'put/your/path'
+mypath=r'path'
 inputlist = [f for f in listdir(mypath) if isfile(join(mypath, f)) and '.json' in f]
 ctr=0
 ctr1=1
 df = pd.DataFrame(columns=['cords', 'name_of_transport'])
+print('process')
 df2=process_2g(inputlist, ctr, ctr1, df)
 df1=df2.groupby(by='cords', group_keys=False)['name_of_transport'].apply(lambda list: set(list))
-print(df1)
+#print(df1)
 path_or_buf=mypath+r'\\density_groupby.csv'
 df1.to_csv(path_or_buf, sep=';')
 csv_proc(mypath)
+print('fin')
