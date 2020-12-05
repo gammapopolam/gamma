@@ -3,6 +3,10 @@
 Created on Sun Nov  1 11:59:05 2020
 
 @author: gamma
+Как работать:
+берем из диска .zip архив, в нем должны быть json файлы с каждым маршрутом.
+в mypath вводим папку, где эти json файлы лежат
+в outputpath вводим папку вывода файлов с геометриями маршрутов.
 """
 from geojson import LineString, Feature, FeatureCollection, dump
 import json
