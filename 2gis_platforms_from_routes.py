@@ -3,6 +3,11 @@
 Created on Sun Nov  1 11:59:05 2020
 
 @author: gamma
+Как использовать:
+в mypath указываем папку где хранятся json с маршрутами (эти файлы находятся в архиве, который находится на диске)
+в outputpath указываем папку где будет храниться geojson с остановками всех маршрутов
+в city - город.
+Последние повторяющиеся строки можно убрать, если вам нужен один город
 """
 from geojson import Point, Feature, FeatureCollection, dump
 import json
